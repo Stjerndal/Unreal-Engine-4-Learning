@@ -19,7 +19,7 @@ public:
 	ABatteryPickup(const FObjectInitializer& ObjectInitializer);
 
 	// Set the amount of power given to player
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Power)
 		float PowerLevel;
 	
 	// Override the OnPickedUp function (use _Implementation because this is a BlueprintNativeEvent)
