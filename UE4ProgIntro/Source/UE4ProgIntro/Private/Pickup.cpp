@@ -21,7 +21,7 @@ APickup::APickup(const FObjectInitializer& ObjectInitializer) : Super(ObjectInit
 	// Turn physics on for the static mesh.
 	PickupMesh->SetSimulatePhysics(true);
 
-	//attach the static mesh component to the root component
+	// attach the static mesh component to the root component
 	PickupMesh->AttachTo(RootComponent);
 
 }
