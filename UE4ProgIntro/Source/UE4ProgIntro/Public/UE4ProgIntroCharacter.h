@@ -15,8 +15,25 @@ class AUE4ProgIntroCharacter : public ACharacter
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
+
 public:
 	AUE4ProgIntroCharacter(const FObjectInitializer& ObjectInitializer);
+
+	// Collection Volume
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Power)
+	class USphereComponent* CollectionSphere;
+
+	// Power level of our character
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Power)
+		float PowerLevel;
+
+	// Power multiplier of the character
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Power)
+		float SpeedFactor;
+
+	// baseline speed of the character
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Power)
+		float BaseSpeed;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
@@ -26,7 +43,17 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
 
+	virtual void Tick(float DeltaSeconds);
+
 protected:
+
+	// Called when we press a key, to collect any batteries inside the spherecomponent
+	UFUNCTION(BlueprintCallable, Category = Power)
+	void CollectBatteries();
+
+	// Called by CollectBatteries() to use the Blueprinted PowerUp functionality
+	UFUNCTION(BlueprintImplementableEvent, Category = Power)
+	void PowerUp(float BatteryPower);
 
 	/** Called for forwards/backward input */
 	void MoveForward(float Value);

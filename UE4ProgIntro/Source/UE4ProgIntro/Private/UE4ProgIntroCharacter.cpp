@@ -2,6 +2,7 @@
 
 #include "UE4ProgIntro.h"
 #include "UE4ProgIntroCharacter.h"
+#include "BatteryPickup.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AUE4ProgIntroCharacter
@@ -9,6 +10,18 @@
 AUE4ProgIntroCharacter::AUE4ProgIntroCharacter(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+
+	// Set base power level
+	PowerLevel = 2000.0f;
+	// Set the dependence on the speed of the power level
+	SpeedFactor = 0.75f;
+	BaseSpeed = 10.0f;
+
+	// Create our battery collection volume
+	CollectionSphere = ObjectInitializer.CreateDefaultSubobject<USphereComponent>(this, TEXT("CollectionSphere"));
+	CollectionSphere->AttachTo(RootComponent);
+	CollectionSphere->SetSphereRadius(200.0f);
+
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
@@ -51,6 +64,8 @@ void AUE4ProgIntroCharacter::SetupPlayerInputComponent(class UInputComponent* In
 	check(InputComponent);
 	InputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	InputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
+
+	InputComponent->BindAction("CollectPickups", IE_Pressed, this, &AUE4ProgIntroCharacter::CollectBatteries);
 
 	InputComponent->BindAxis("MoveForward", this, &AUE4ProgIntroCharacter::MoveForward);
 	InputComponent->BindAxis("MoveRight", this, &AUE4ProgIntroCharacter::MoveRight);
@@ -125,4 +140,41 @@ void AUE4ProgIntroCharacter::MoveRight(float Value)
 		// add movement in that direction
 		AddMovementInput(Direction, Value);
 	}
+}
+
+void AUE4ProgIntroCharacter::CollectBatteries()
+{
+	float BatteryPower = 0.0f;
+
+	// Get all overlapping Actors and store them in a CollectedActors array
+	TArray<AActor*> CollectedActors;
+	CollectionSphere->GetOverlappingActors(CollectedActors);
+
+	// For each Actor collected
+	for (int32 iCollected = 0; iCollected < CollectedActors.Num(); ++iCollected)
+	{
+		// Cast the collected Actor to ABatteryPickup
+		ABatteryPickup* const TestBattery = Cast<ABatteryPickup>(CollectedActors[iCollected]);
+
+		// If the cast is successful, and the battery is valid and active
+		if (TestBattery && !TestBattery->IsPendingKill() && TestBattery->bIsActive) {
+			// Store its battery power for adding to the character's power
+			BatteryPower += TestBattery->PowerLevel;
+			// Deactivate the battery
+			TestBattery->bIsActive = false;
+			// Call the battery's OnPickedUp function
+			TestBattery->OnPickedUp();
+		}
+	}
+
+	if (BatteryPower > 0.f) {
+		PowerUp(BatteryPower);
+	}
+
+}
+
+void AUE4ProgIntroCharacter::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	GetCharacterMovement()->MaxWalkSpeed = SpeedFactor * PowerLevel + BaseSpeed;
 }
