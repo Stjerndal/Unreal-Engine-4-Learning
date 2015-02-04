@@ -43,7 +43,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
 
-	virtual void Tick(float DeltaSeconds);
+	virtual void Tick(float DeltaSeconds) override;
 
 protected:
 

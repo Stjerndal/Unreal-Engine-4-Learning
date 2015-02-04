@@ -37,7 +37,7 @@ public:
 	UFUNCTION(BlueprintPure, Category = Spawning)
 	FVector GetRandomPointInVolume();
 
-	virtual void Tick(float DeltaSeconds);
+	virtual void Tick(float DeltaSeconds) override;
 
 	void EnableSpawning();
 
