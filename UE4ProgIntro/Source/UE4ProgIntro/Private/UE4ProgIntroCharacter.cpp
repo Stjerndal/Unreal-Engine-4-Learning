@@ -3,6 +3,8 @@
 #include "UE4ProgIntro.h"
 #include "UE4ProgIntroCharacter.h"
 #include "BatteryPickup.h"
+#include "UE4ProgIntroGameMode.h"
+#include "Kismet/GameplayStatics.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AUE4ProgIntroCharacter
@@ -146,31 +148,37 @@ void AUE4ProgIntroCharacter::CollectBatteries()
 {
 	float BatteryPower = 0.0f;
 
-	// Get all overlapping Actors and store them in a CollectedActors array
-	TArray<AActor*> CollectedActors;
-	CollectionSphere->GetOverlappingActors(CollectedActors);
+	AUE4ProgIntroGameMode* MyGameMode = Cast < AUE4ProgIntroGameMode>(UGameplayStatics::GetGameMode(this));
 
-	// For each Actor collected
-	for (int32 iCollected = 0; iCollected < CollectedActors.Num(); ++iCollected)
+
+	// if we are currently playing
+	if (MyGameMode->GetCurrentState() == EUE4ProgIntroPlayerState::EPlaying)
 	{
-		// Cast the collected Actor to ABatteryPickup
-		ABatteryPickup* const TestBattery = Cast<ABatteryPickup>(CollectedActors[iCollected]);
+		// Get all overlapping Actors and store them in a CollectedActors array
+		TArray<AActor*> CollectedActors;
+		CollectionSphere->GetOverlappingActors(CollectedActors);
 
-		// If the cast is successful, and the battery is valid and active
-		if (TestBattery && !TestBattery->IsPendingKill() && TestBattery->bIsActive) {
-			// Store its battery power for adding to the character's power
-			BatteryPower += TestBattery->PowerLevel;
-			// Deactivate the battery
-			TestBattery->bIsActive = false;
-			// Call the battery's OnPickedUp function
-			TestBattery->OnPickedUp();
+		// For each Actor collected
+		for (int32 iCollected = 0; iCollected < CollectedActors.Num(); ++iCollected)
+		{
+			// Cast the collected Actor to ABatteryPickup
+			ABatteryPickup* const TestBattery = Cast<ABatteryPickup>(CollectedActors[iCollected]);
+
+			// If the cast is successful, and the battery is valid and active
+			if (TestBattery && !TestBattery->IsPendingKill() && TestBattery->bIsActive) {
+				// Store its battery power for adding to the character's power
+				BatteryPower += TestBattery->PowerLevel;
+				// Deactivate the battery
+				TestBattery->bIsActive = false;
+				// Call the battery's OnPickedUp function
+				TestBattery->OnPickedUp();
+			}
+		}
+
+		if (BatteryPower > 0.f) {
+			PowerUp(BatteryPower);
 		}
 	}
-
-	if (BatteryPower > 0.f) {
-		PowerUp(BatteryPower);
-	}
-
 }
 
 void AUE4ProgIntroCharacter::Tick(float DeltaSeconds)
