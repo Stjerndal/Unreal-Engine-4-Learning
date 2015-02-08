@@ -4,6 +4,7 @@
 #include "UE4ProgIntroGameMode.h"
 #include "UE4ProgIntroCharacter.h"
 #include "Kismet/GameplayStatics.h"
+#include "ProgIntroHUD.h"
 
 AUE4ProgIntroGameMode::AUE4ProgIntroGameMode(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -15,8 +16,11 @@ AUE4ProgIntroGameMode::AUE4ProgIntroGameMode(const FObjectInitializer& ObjectIni
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
 
+	// set the default HUD class
+	HUDClass = AProgIntroHUD::StaticClass();
+
 	// base decay rate
-	DecayRate = 1.f;
+	DecayRate = .25f;
 }
 
 
