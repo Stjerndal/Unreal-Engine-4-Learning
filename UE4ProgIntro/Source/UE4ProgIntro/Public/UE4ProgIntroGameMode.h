@@ -1,6 +1,7 @@
 // Copyright 1998-2014 Epic Games, Inc. All Rights Reserved.
 #pragma once
 #include "GameFramework/GameMode.h"
+#include "SpawnVolume.h"
 #include "UE4ProgIntroGameMode.generated.h"
 
 // enum to store the current state of gameplay
@@ -28,7 +29,11 @@ public:
 
 	void SetCurrentState(EUE4ProgIntroPlayerState NewState);
 
+	virtual void BeginPlay() override;
+
 private:
+	TArray<ASpawnVolume*> SpawnVolumeActors;
+
 	EUE4ProgIntroPlayerState CurrentState;
 
 	void HandleNewState(EUE4ProgIntroPlayerState NewState);

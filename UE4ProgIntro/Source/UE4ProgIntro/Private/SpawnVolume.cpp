@@ -20,8 +20,6 @@ ASpawnVolume::ASpawnVolume(const FObjectInitializer& ObjectInitializer) : Super(
 
 	// Make the SpawnVolume tickable
 	PrimaryActorTick.bCanEverTick = true;
-
-	EnableSpawning();
 }
 
 void ASpawnVolume::SpawnPickup()

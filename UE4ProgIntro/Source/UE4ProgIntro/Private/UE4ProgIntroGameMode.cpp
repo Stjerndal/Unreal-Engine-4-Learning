@@ -73,3 +73,24 @@ void AUE4ProgIntroGameMode::HandleNewState(EUE4ProgIntroPlayerState NewState)
 		break;
 	}
 }
+
+void AUE4ProgIntroGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// find all the spawn volume actors
+	TArray<AActor*> FoundActors;
+
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASpawnVolume::StaticClass(), FoundActors);
+
+	for (auto Actor : FoundActors)
+	{
+		ASpawnVolume* SpawnVolumeActor = Cast<ASpawnVolume>(Actor);
+		if (SpawnVolumeActor)
+		{
+			SpawnVolumeActors.Add(SpawnVolumeActor);
+		}
+	}
+
+	SetCurrentState(EUE4ProgIntroPlayerState::EPlaying);
+}
